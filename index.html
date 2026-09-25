@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>АрбитрПро — КП для партнёров</title>
+  <style>
+    :root{
+      --dark:#19322E;
+      --gold:#BEAC8C;
+      --cream:#F7EBDD;
+      --ink:#3A3737;
+      --red:#C25B4E;
+      --green:#5FA97E;
+      --line:rgba(190,172,140,.28);
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      height:100%;
+      margin:0;
+      overflow:hidden;
+      background:var(--dark);
+      color:var(--cream);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -webkit-text-size-adjust:100%;
+    }
+    body{
+      height:100dvh;
+    }
+    a{color:inherit}
+    button,input{font:inherit}
+
+    .app-header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      height:58px;
+      z-index:80;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 18px;
+      background:rgba(25,50,46,.86);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(190,172,140,.18);
+    }
+    .brand{
+      font-weight:900;
+      font-size:16px;
+      letter-spacing:-.01em;
+      color:var(--cream);
+    }
+    .counter{
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:.14em;
+      color:var(--gold);
+      white-space:nowrap;
+    }
+    .progress{
+      position:fixed;
+      top:58px;
+      left:0;
+      height:3px;
+      width:11.11%;
+      background:linear-gradient(90deg,var(--gold),#e2d2b2);
+      z-index:81;
+      transition:width .35s ease;
+    }
+
+    .nav-controls{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:90;
+      display:flex;
+      gap:10px;
+    }
+    .nav-btn{
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      border:1px solid rgba(190,172,140,.45);
+      background:rgba(25,50,46,.72);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      color:var(--gold);
+      font-size:28px;
+      line-height:1;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      transition:background .2s,color .2s,border-color .2s,transform .2s,opacity .2s;
+    }
+    .nav-btn:hover:not(:disabled){
+      background:var(--gold);
+      color:var(--dark);
+      border-color:var(--gold);
+      transform:translateY(-1px);
+    }
+    .nav-btn:disabled{
+      opacity:.32;
+      cursor:default;
+    }
+
+    .stage{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+    }
+    .track{
+      display:flex;
+      width:100%;
+      height:100%;
+      transition:transform .52s cubic-bezier(.22,.61,.36,1);
+      will-change:transform;
+    }
+    .slide{
+      flex:0 0 100%;
+      width:100%;
+      height:100%;
+      height:100dvh;
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding:92px 20px 120px;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+    }
+    .slide.dark{background:var(--dark);color:var(--cream)}
+    .slide.light{background:var(--cream);color:var(--ink)}
+    .wrap{
+      max-width:1120px;
+      margin:0 auto;
+    }
+
+    .kicker{
+      font-size:clamp(11px,1vw,14px);
+      letter-spacing:.26em;
+      text-transform:uppercase;
+      font-weight:900;
+      color:var(--gold);
+      margin-bottom:14px;
+    }
+    .light .kicker{color:#9c8763}
+    h1{
+      font-size:clamp(31px,5.8vw,74px);
+      line-height:1.04;
+      font-weight:900;
+      letter-spacing:-.03em;
+      margin:0;
+    }
+    h2{
+      font-size:clamp(24px,3.6vw,46px);
+      line-height:1.06;
+      font-weight:900;
+      letter-spacing:-.02em;
+      margin:0 0 8px;
+    }
+    h3{
+      font-size:clamp(16px,1.5vw,20px);
+      font-weight:900;
+      margin:0 0 8px;
+      letter-spacing:-.01em;
+    }
+    .hl{color:var(--gold)}
+    .light .hl{color:#a8895a}
+    .lead{
+      font-size:clamp(15px,1.7vw,21px);
+      line-height:1.5;
+      max-width:64ch;
+      margin:14px 0 0;
+      opacity:.92;
+    }
+
+    .grid{display:grid;gap:14px;margin-top:24px}
+    .g2{grid-template-columns:repeat(2,1fr)}
+    .g3{grid-template-columns:repeat(3,1fr)}
+    .g4{grid-template-columns:repeat(4,1fr)}
+    @media(max-width:900px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+    .card{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px;
+    }
+    .light .card{
+      background:#fff;
+      border-color:rgba(58,55,55,.1);
+      box-shadow:0 12px 30px rgba(25,50,46,.07);
+    }
+    .card p{
+      margin:0;
+      font-size:clamp(13px,1.15vw,15.5px);
+      line-height:1.45;
+      opacity:.86;
+    }
+    .card.risk{
+      border-color:rgba(194,91,78,.4);
+      background:rgba(194,91,78,.08);
+    }
+
+    .cta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:24px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      font-weight:900;
+      font-size:clamp(14px,1.3vw,17px);
+      padding:15px 22px;
+      border-radius:14px;
+      border:1px solid transparent;
+      cursor:pointer;
+      appearance:none;
+    }
+    .btn.gold{
+      background:var(--gold);
+      color:var(--dark);
+      box-shadow:0 12px 30px rgba(190,172,140,.25);
+    }
+    .btn.ghost{
+      background:transparent;
+      color:var(--cream);
+      border-color:rgba(190,172,140,.5);
+    }
+    .light .btn.ghost{
+      color:var(--ink);
+      border-color:rgba(58,55,55,.2);
+    }
+
+    .proof-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:24px;
+    }
+    @media(max-width:900px){.proof-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.proof-grid{grid-template-columns:1fr}}
+    .proof{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px;
+      min-height:118px;
+    }
+    .proof-wide{
+      grid-column:1/-1;
+      background:linear-gradient(135deg,rgba(190,172,140,.18),rgba(190,172,140,.04));
+      border-color:rgba(190,172,140,.45);
+      min-height:auto;
+    }
+    .proof-num{
+      font-size:clamp(28px,4vw,46px);
+      font-weight:900;
+      color:var(--gold);
+      line-height:1;
+      margin-bottom:8px;
+    }
+    .proof-wide .proof-num{font-size:clamp(40px,7vw,72px)}
+    .proof-num small{
+      font-size:.42em;
+      font-weight:900;
+      opacity:.82;
+      margin-left:4px;
+    }
+    .proof-title{
+      font-size:15px;
+      font-weight:900;
+      opacity:.92;
+    }
+    .fine{
+      font-size:12px;
+      line-height:1.45;
+      opacity:.68;
+      margin-top:16px;
+      max-width:90ch;
+    }
+
+    .chart{
+      margin-top:24px;
+      display:grid;
+      gap:16px;
+    }
+    .chart-row{
+      display:grid;
+      grid-template-columns:72px 1fr;
+      gap:10px 12px;
+      align-items:center;
+    }
+    .chart-pct{
+      font-size:clamp(20px,3vw,32px);
+      font-weight:900;
+      color:#a8895a;
+      line-height:1;
+    }
+    .chart-track{
+      height:34px;
+      background:rgba(58,55,55,.08);
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .chart-fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--gold),#9c8763);
+    }
+    .chart-range{
+      grid-column:2;
+      font-size:13px;
+      opacity:.75;
+      margin-top:-4px;
+      line-height:1.35;
+    }
+
+    .calc{
+      position:relative;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      margin-top:24px;
+    }
+    .slider-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      font-weight:900;
+      color:var(--gold);
+      font-size:14px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .slider-value{
+      min-width:72px;
+      text-align:right;
+      color:var(--cream);
+      font-size:18px;
+      letter-spacing:0;
+      text-transform:none;
+    }
+    input[type=range]{
+      width:100%;
+      accent-color:var(--gold);
+      margin:4px 0 16px;
+    }
+    .asset-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:16px;
+    }
+    .asset-title{
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight:900;
+      opacity:.65;
+      margin-right:4px;
+    }
+    .asset-btn{
+      cursor:pointer;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:900;
+      font-size:14px;
+      color:var(--cream);
+      background:rgba(255,255,255,.04);
+      user-select:none;
+      -webkit-user-select:none;
+    }
+    .asset-btn.active{
+      background:var(--gold);
+      color:var(--dark);
+      border-color:var(--gold);
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+    @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+    .cc{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+    .lab{
+      font-size:11px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      opacity:.62;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+    .val{
+      font-size:clamp(19px,2.4vw,29px);
+      font-weight:900;
+      letter-spacing:-.02em;
+      color:var(--cream);
+      line-height:1.05;
+    }
+    .val.gold{color:var(--gold)}
+    .val.green{color:var(--green)}
+    .sub{
+      font-size:12px;
+      opacity:.62;
+      margin-top:6px;
+      line-height:1.3;
+    }
+    .net{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:14px;
+      background:linear-gradient(135deg,rgba(95,169,126,.16),rgba(95,169,126,.04));
+      border:1px solid rgba(95,169,126,.45);
+      border-radius:18px;
+      padding:18px 22px;
+      margin-top:14px;
+    }
+    .net .l{
+      font-size:clamp(14px,1.4vw,18px);
+      font-weight:900;
+      line-height:1.3;
+    }
+    .net .l span{
+      display:block;
+      font-size:.72em;
+      font-weight:500;
+      opacity:.72;
+      margin-top:4px;
+    }
+    .r{
+      font-size:clamp(25px,3.4vw,42px);
+      font-weight:900;
+      letter-spacing:-.02em;
+      color:var(--green);
+      white-space:nowrap;
+    }
+    .cashbox{
+      display:none;
+      background:rgba(190,172,140,.14);
+      border:1px solid rgba(190,172,140,.5);
+      border-radius:16px;
+      padding:18px 22px;
+      margin-top:14px;
+      font-size:clamp(13px,1.25vw,16px);
+      line-height:1.45;
+    }
+    .cashbox.show{display:block}
+    .cashbox b{color:var(--gold);font-weight:900}
+    .plain{
+      margin-top:14px;
+      font-size:12px;
+      line-height:1.45;
+      opacity:.72;
+      border-left:2px solid var(--gold);
+      padding-left:12px;
+    }
+    .plain b{color:var(--gold)}
+
+    .offer{
+      display:grid;
+      grid-template-columns:1.25fr 1fr;
+      gap:18px;
+      margin-top:24px;
+    }
+    @media(max-width:900px){.offer{grid-template-columns:1fr}}
+    .big{
+      background:linear-gradient(135deg,rgba(190,172,140,.22),rgba(190,172,140,.06));
+      border:1px solid rgba(190,172,140,.4);
+      border-radius:22px;
+      padding:24px;
+    }
+    .big .t{
+      font-size:clamp(19px,2.3vw,29px);
+      font-weight:900;
+      letter-spacing:-.02em;
+      line-height:1.15;
+    }
+    .big .t em{font-style:normal;color:var(--gold)}
+    .claim{
+      font-size:clamp(16px,1.8vw,22px);
+      font-weight:900;
+      line-height:1.3;
+      margin:0 0 6px;
+    }
+    .claim span{color:var(--gold)}
+    .list{
+      list-style:none;
+      margin:8px 0 0;
+      padding:0;
+    }
+    .list li{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      font-size:clamp(13.5px,1.25vw,16.5px);
+      line-height:1.4;
+      margin:12px 0;
+    }
+    .list li > div{flex:1;min-width:0}
+    .list li b{color:var(--gold);font-weight:900}
+    .dotmark{
+      flex:0 0 auto;
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:var(--gold);
+      margin-top:7px;
+    }
+    .rate-card{
+      margin-top:10px;
+      border:1px solid rgba(190,172,140,.35);
+      border-radius:14px;
+      overflow:hidden;
+      background:rgba(0,0,0,.12);
+    }
+    .rate-head,.rate-row{
+      display:grid;
+      grid-template-columns:1.1fr .75fr 1.05fr;
+      gap:8px;
+      padding:10px 12px;
+      font-size:clamp(12px,1.1vw,14px);
+      font-weight:800;
+    }
+    .rate-head{
+      background:rgba(190,172,140,.14);
+      color:var(--gold);
+      font-size:11px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .rate-row{border-top:1px solid rgba(190,172,140,.18)}
+    .rate-row span:nth-child(2){color:var(--cream)}
+    .rate-row span:nth-child(3){color:var(--green)}
+    .rate-note{
+      margin-top:8px;
+      font-size:12px;
+      opacity:.72;
+      line-height:1.35;
+    }
+    .steps{
+      counter-reset:st;
+      list-style:none;
+      margin:6px 0 0;
+      padding:0;
+    }
+    .steps li{
+      counter-increment:st;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      font-size:clamp(13.5px,1.25vw,16.5px);
+      line-height:1.4;
+      margin:16px 0;
+    }
+    .steps li:before{
+      content:counter(st);
+      flex:0 0 auto;
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      background:rgba(190,172,140,.18);
+      color:var(--gold);
+      font-weight:900;
+      font-size:15px;
+      display:grid;
+      place-items:center;
+    }
+    .steps li b{color:var(--gold);font-weight:900}
+    .pay-note{
+      margin-top:18px;
+      font-size:clamp(12px,1.05vw,14px);
+      line-height:1.5;
+      opacity:.74;
+      max-width:92ch;
+    }
+
+    .slide.vip{
+      background:
+        radial-gradient(120% 90% at 50% 0%, rgba(190,172,140,.12), transparent 55%),
+        linear-gradient(165deg,#152925 0%,#19322E 50%,#10211d 100%);
+      color:var(--cream);
+    }
+    .vip-frame{
+      border:1px solid rgba(190,172,140,.4);
+      border-radius:24px;
+      padding:30px 26px 26px;
+      box-shadow:0 30px 80px rgba(0,0,0,.35), inset 0 0 60px rgba(190,172,140,.04);
+    }
+    @media(max-width:560px){.vip-frame{padding:22px 16px 18px}}
+    .vip-plate{
+      display:inline-block;
+      border:1px solid var(--gold);
+      color:var(--gold);
+      padding:8px 18px;
+      border-radius:999px;
+      font-size:11px;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      font-weight:900;
+      margin-bottom:18px;
+    }
+    .vip h2{font-size:clamp(28px,4.4vw,54px);margin-bottom:6px}
+    .vip-sub{
+      font-size:clamp(15px,1.6vw,20px);
+      color:var(--gold);
+      opacity:.85;
+      margin:6px 0 0;
+      font-weight:600;
+    }
+    .vip-rule{
+      height:1px;
+      background:linear-gradient(90deg,var(--gold),rgba(190,172,140,.15),transparent);
+      margin:24px 0 26px;
+    }
+    .vip-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+    }
+    .vip-card--wide{grid-column:span 2}
+    @media(max-width:1100px){
+      .vip-grid{grid-template-columns:repeat(2,1fr)}
+      .vip-card--wide{grid-column:span 2}
+    }
+    @media(max-width:640px){
+      .vip-grid{grid-template-columns:1fr}
+      .vip-card--wide{grid-column:span 1}
+    }
+    .vip-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(190,172,140,.3);
+      border-radius:18px;
+      padding:24px 22px;
+    }
+    .vip-card--gold{
+      border-color:var(--gold);
+      background:linear-gradient(135deg,rgba(190,172,140,.14),rgba(190,172,140,.03));
+    }
+    .vip-icon{
+      width:48px;
+      height:48px;
+      border:1px solid rgba(190,172,140,.45);
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      margin-bottom:16px;
+      background:rgba(190,172,140,.08);
+      font-size:24px;
+      line-height:1;
+    }
+    .vip-card h3{
+      font-size:clamp(17px,1.7vw,22px);
+      font-weight:900;
+      color:var(--gold);
+      margin:0 0 8px;
+      letter-spacing:-.01em;
+    }
+    .vip-card p{
+      margin:0;
+      font-size:clamp(13.5px,1.2vw,15.5px);
+      line-height:1.5;
+      opacity:.82;
+      color:var(--cream);
+    }
+
+    .center .wrap{
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .center .lead{margin-left:auto;margin-right:auto}
+    .center .cta{justify-content:center}
+    .contacts{
+      margin-top:22px;
+      font-size:clamp(13px,1.2vw,16px);
+      line-height:1.7;
+      opacity:.86;
+    }
+    .contacts b{color:var(--gold);font-weight:900}
+
+    @media(max-width:640px){
+      .nav-controls{
+        right:50%;
+        transform:translateX(50%);
+        bottom:14px;
+      }
+      .nav-btn{
+        width:48px;
+        height:48px;
+        font-size:24px;
+      }
+      .slide{
+        padding-bottom:104px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">АрбитрПро</div>
+    <div class="counter"><span id="currentPage">01</span> / <span id="totalPages">09</span></div>
+  </header>
+  <div class="progress" id="progress"></div>
+
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Предыдущая страница">&lsaquo;</button>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Следующая страница">&rsaquo;</button>
+  </div>
+
+  <main class="stage" id="stage">
+    <div class="track" id="track">
+
+      <!-- 01 -->
+      <section class="slide dark center" id="s1">
+        <div class="wrap">
+          <div class="kicker">Коммерческое предложение для партнёров</div>
+          <h1>Сделайте направление АУ <span class="hl">прибыльным</span> — без головной боли</h1>
+          <p class="lead">6 лет на рынке. 4 000+ завершённых дел. Партнёры по всей России. Работаем как система, а не как один человек.</p>
+          <div class="cta">
+            <button class="btn gold" type="button" data-go="1">Смотреть, как это работает ↓</button>
+            <button class="btn ghost" type="button" data-go="5">Посчитать доход ↓</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="slide light" id="s2">
+        <div class="wrap">
+          <h2>Когда дел тысячи — <span class="hl">ручное управление перестаёт работать</span></h2>
+          <div class="grid g2">
+            <div class="card risk">
+              <h3>Непонятно, сколько денег в деле</h3>
+              <p>Где прибыль, где убыток — считаете по ощущениям или не считаете вообще.</p>
+            </div>
+            <div class="card risk">
+              <h3>Свой АУ ушёл — и унёс всё с собой</h3>
+              <p>Депозиты, портфель, документы. Вы остались с клиентами и вопросами без ответов.</p>
+            </div>
+            <div class="card risk">
+              <h3>Всё держится на одном человеке</h3>
+              <p>Заболел, устал, уволился — и весь поток встал.</p>
+            </div>
+            <div class="card risk">
+              <h3>Срывы бьют по репутации</h3>
+              <p>ПМ задержали. Торги отложили. Завершение оттянули. Клиенты недовольны, рекомендации слабеют.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 -->
+      <section class="slide dark" id="s3">
+        <div class="wrap">
+          <h2>Команда, которая <span class="hl">не подведёт</span></h2>
+          <p class="lead">Мы не предлагаем «ещё одного АУ в штат». Мы становимся Вашим резервом и конвейером, который подхватит любой объём и не развалится, если сотрудник заболеет или уволится.</p>
+          <div class="grid g3">
+            <div class="card">
+              <h3>6 АУ + 3 в резерве</h3>
+              <p>Не один человек, а команда. Кто-то ушёл — никто не бросил дела.</p>
+            </div>
+            <div class="card">
+              <h3>60+ специалистов</h3>
+              <p>Отделы торгов, завершения и ежедневные специалисты по банковским процедурам — каждый на своём участке конвейера.</p>
+            </div>
+            <div class="card">
+              <h3>90% процессов — по регламентам</h3>
+              <p>Не «надо помнить», а «система не забудет».</p>
+            </div>
+            <div class="card">
+              <h3>ПМ за 3 рабочих дня</h3>
+              <p>Как только деньги пришли — сразу перечисляем. Без напоминаний.</p>
+            </div>
+            <div class="card">
+              <h3>Сложные кейсы берём</h3>
+              <p>Ипотека, авто, доли, СВО, ООО, крипта, наследство. Не отказываем.</p>
+            </div>
+            <div class="card">
+              <h3>Онлайн-кабинет</h3>
+              <p>Статус каждого дела — 24/7. Никаких «а что там по делу?».</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section class="slide dark" id="s4">
+        <div class="wrap">
+          <h2>Не обещания, а <span class="hl">рабочие цифры</span></h2>
+          <div class="proof-grid">
+            <div class="proof proof-wide">
+              <div class="proof-num">4 000+</div>
+              <div class="proof-title">завершённых дел</div>
+            </div>
+            <div class="proof">
+              <div class="proof-num">7,2<small>мес</small></div>
+              <div class="proof-title">средний срок процедуры</div>
+            </div>
+            <div class="proof">
+              <div class="proof-num">78</div>
+              <div class="proof-title">партнёров по всей России</div>
+            </div>
+            <div class="proof">
+              <div class="proof-num">6 + 3</div>
+              <div class="proof-title">АУ в работе и резерве</div>
+            </div>
+            <div class="proof">
+              <div class="proof-num">60+</div>
+              <div class="proof-title">специалистов</div>
+            </div>
+            <div class="proof">
+              <div class="proof-num">3 дня</div>
+              <div class="proof-title">срок перечисления ПМ</div>
+            </div>
+            <div class="proof">
+              <div class="proof-num">5 000+</div>
+              <div class="proof-title">дел подано в суд</div>
+            </div>
+          </div>
+          <p class="fine">Цифры по внутренней отчётности на сентябрь 2026. Среди партнёров: Квинтагон, Ваш Юрист, ЮК IUS, ДолгЭксперт. По запросу покажем выгрузку.</p>
+        </div>
+      </section>
+
+      <!-- 05 -->
+      <section class="slide light" id="s5">
+        <div class="wrap">
+          <h2>Кэшбек с реализации <span class="hl">имущества</span></h2>
+          <p class="lead">Когда в деле есть имущество, Вы получаете долю от вознаграждения арбитражного управления. Чем дороже актив — тем выше Ваш процент.</p>
+
+          <div class="chart">
+            <div class="chart-row">
+              <div class="chart-pct">20%</div>
+              <div class="chart-track"><div class="chart-fill" style="width:40%"></div></div>
+              <div class="chart-range">стоимость имущества до 1,5 млн ₽</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-pct">30%</div>
+              <div class="chart-track"><div class="chart-fill" style="width:60%"></div></div>
+              <div class="chart-range">от 1,5 до 3 млн ₽</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-pct">40%</div>
+              <div class="chart-track"><div class="chart-fill" style="width:80%"></div></div>
+              <div class="chart-range">от 3 до 5 млн ₽</div>
+            </div>
+            <div class="chart-row">
+              <div class="chart-pct">50%</div>
+              <div class="chart-track"><div class="chart-fill" style="width:100%"></div></div>
+              <div class="chart-range">свыше 5 млн ₽</div>
+            </div>
+          </div>
+
+          <p class="fine">Пример: имущество 2 млн ₽ → вознаграждение АУ 140 000 ₽ → Ваша доля 30% = 42 000 ₽. При объёме 50+ дел в месяц — фиксированные 50% на эти дела. Выплата после поступления денег от реализации.</p>
+        </div>
+      </section>
+
+      <!-- 06 -->
+      <section class="slide dark" id="s6">
+        <div class="wrap">
+          <h2>Сколько мы будем <span class="hl">Вам платить</span></h2>
+          <p class="lead">Выберите точное количество дел и примерную стоимость имущества. Калькулятор показывает гарантированные бонусы и потенциальный кэшбек с реализации.</p>
+
+          <div class="calc">
+            <div class="slider-row">
+              <span>Дел в месяц</span>
+              <span class="slider-value" id="volValue">10</span>
+            </div>
+            <input type="range" id="volSlider" min="1" max="200" step="1" value="10" aria-label="Количество дел в месяц">
+
+            <div class="asset-row">
+              <span class="asset-title">Имущество в деле</span>
+              <button class="asset-btn active" type="button" data-asset="0">нет</button>
+              <button class="asset-btn" type="button" data-asset="500000">500 тыс.</button>
+              <button class="asset-btn" type="button" data-asset="2000000">2 млн</button>
+              <button class="asset-btn" type="button" data-asset="4000000">4 млн</button>
+              <button class="asset-btn" type="button" data-asset="10000000">10 млн</button>
+            </div>
+
+            <div class="cards">
+              <div class="cc">
+                <div class="lab">Бонус за дело</div>
+                <div class="val gold" id="bonusPerCase">2 000 ₽</div>
+                <div class="sub">на карту, 3-го числа</div>
+              </div>
+              <div class="cc">
+                <div class="lab">Бонусами в месяц</div>
+                <div class="val green" id="bonusMonthly">20 000 ₽</div>
+                <div class="sub">гарантированная часть</div>
+              </div>
+              <div class="cc">
+                <div class="lab">Кэшбек с одного дела</div>
+                <div class="val" id="cashbackCase">0 ₽</div>
+                <div class="sub">если будет реализация имущества</div>
+              </div>
+              <div class="cc">
+                <div class="lab">Условия кэшбека</div>
+                <div class="val" id="cashbackCondition">20–50%</div>
+                <div class="sub">от вознаграждения АУ</div>
+              </div>
+            </div>
+
+            <div class="net">
+              <div class="l">Бонусы + кэшбек<span>бонусы за объём плюс расчётный кэшбек с одного дела при выбранной стоимости имущества</span></div>
+              <div class="r" id="totalPayout">+20 000 ₽</div>
+            </div>
+
+            <div class="cashbox" id="cashbox">
+              <b>🔥 Объём 50+ → кэшбек 50% на эти дела.</b><br>
+              Пример: продали имущество за 2 млн ₽ → вознаграждение АУ 140 000 ₽ → Ваша доля 50% = 70 000 ₽ вместо 42 000 ₽.
+            </div>
+
+            <div class="plain">
+              <b>Коротко:</b> 1–10 дел — 25 000 ₽ расходы, 2 000 ₽ бонус; 11–49 — 20 000 ₽, 2 000 ₽; 50+ — 15 000 ₽, 3 000 ₽ и кэшбек 50%. Первые 3 дела — тестовые: без судебных расходов и без бонуса. Кэшбек в итоговой строке посчитан по одному делу; если реализаций несколько — сумма выше, если имущества нет — остаётся гарантированный бонусный поток.
+            </div>
+          </div>
+
+          <p class="fine">Судебные расходы обычно платит должник. Если расходы платите Вы — при наличии конкурсной массы возвращаем сумму на карту или зачитываем на новые дела.</p>
+        </div>
+      </section>
+
+      <!-- 07 -->
+      <section class="slide dark" id="s7">
+        <div class="wrap">
+          <h2>3 дела на тест — <span class="hl">без оплаты расходов</span></h2>
+          <div class="offer">
+            <div class="big">
+              <p class="claim">Не верите на слово — <span>проверьте</span>. Мы не просим доверять, мы даём попробовать.</p>
+              <ul class="list">
+                <li>
+                  <span class="dotmark"></span>
+                  <div>Тест-драйв: первые <b>3 дела без оплаты</b> судебных расходов.</div>
+                </li>
+                <li>
+                  <span class="dotmark"></span>
+                  <div>
+                    <b>Ставки и бонусы по объёму:</b>
+                    <div class="rate-card">
+                      <div class="rate-head">
+                        <span>Объём в месяц</span>
+                        <span>Ставка за дело</span>
+                        <span>Бонус за дело</span>
+                      </div>
+                      <div class="rate-row">
+                        <span>1–10 дел</span>
+                        <span>25 000 ₽</span>
+                        <span>2 000 ₽</span>
+                      </div>
+                      <div class="rate-row">
+                        <span>11–49 дел</span>
+                        <span>20 000 ₽</span>
+                        <span>2 000 ₽</span>
+                      </div>
+                      <div class="rate-row">
+                        <span>50+ дел</span>
+                        <span>15 000 ₽</span>
+                        <span>3 000 ₽ + кэшбек 50%</span>
+                      </div>
+                    </div>
+                    <div class="rate-note">Бонусы выплачиваются по рабочим делам, кроме тестовых. Точные условия фиксируются в договоре и приложении.</div>
+                  </div>
+                </li>
+                <li>
+                  <span class="dotmark"></span>
+                  <div>ПМ должнику — в течение <b>3 рабочих дней</b> после поступления денег на счёт.</div>
+                </li>
+                <li>
+                  <span class="dotmark"></span>
+                  <div>Отвечаем по <b>сложным кейсам</b> и будущим делам — не бросаем на нестандартных ситуациях.</div>
+                </li>
+              </ul>
+            </div>
+            <div class="big">
+              <div class="t" style="font-size:clamp(18px,2vw,26px)">Как <em>начинаем</em></div>
+              <ol class="steps">
+                <li><div><b>Оставляете заявку.</b></div></li>
+                <li><div><b>Созваниваемся,</b> обсуждаем объём и условия.</div></li>
+                <li><div><b>Подключаем личный кабинет.</b></div></li>
+                <li><div><b>Передаёте первые 3 дела.</b></div></li>
+                <li><div><b>Смотрите на результат</b> — и решаете сами.</div></li>
+              </ol>
+            </div>
+          </div>
+          <p class="pay-note">Оплата судебных расходов — после признания должника банкротом. В большинстве случаев их вносит должник; если платите Вы — при наличии конкурсной массы возвращаем сумму на карту или зачитываем на новые дела. ПМ перечисляем в течение 3 рабочих дней после поступления денег на счёт.</p>
+        </div>
+      </section>
+
+      <!-- 08 -->
+      <section class="slide vip" id="s8">
+        <div class="wrap">
+          <div class="vip-frame">
+            <span class="vip-plate">ВИП-партнёрам</span>
+            <h2>От 50 дел в месяц — <span class="hl">индивидуальные условия</span></h2>
+            <p class="vip-sub">Только для партнёров с большим потоком</p>
+            <div class="vip-rule"></div>
+
+            <div class="vip-grid">
+              <div class="vip-card vip-card--gold vip-card--wide">
+                <div class="vip-icon">✅</div>
+                <h3>5 дел на тест</h3>
+                <p>Без оплаты судебных расходов. Только для партнёров с потоком от 50 дел в месяц.</p>
+              </div>
+
+              <div class="vip-card">
+                <div class="vip-icon">👤</div>
+                <h3>Ваш персональный менеджер</h3>
+                <p>Отдельный менеджер ведёт только Ваши дела и не распыляется на других партнёров.</p>
+              </div>
+
+              <div class="vip-card">
+                <div class="vip-icon">🛡️</div>
+                <h3>Старший сопроводитель</h3>
+                <p>При большом потоке выделяем старшего — курирует Ваши дела и координирует внутренние процессы.</p>
+              </div>
+
+              <div class="vip-card">
+                <div class="vip-icon">📝</div>
+                <h3>Индивидуальные условия</h3>
+                <p>Ставка, порядок оплаты и формат — под Ваш поток. Не по общему прайсу.</p>
+              </div>
+
+              <div class="vip-card">
+                <div class="vip-icon">⭐</div>
+                <h3>Ранний доступ</h3>
+                <p>Новые продукты — мировые соглашения, ЛПРД, работа под Вашим брендом — сначала Вам, до общего доступа.</p>
+              </div>
+
+              <div class="vip-card">
+                <div class="vip-icon">💳</div>
+                <h3>Карта к спецсчёту</h3>
+                <p>Скоро — только для Ваших клиентов. Должнику не придётся идти в отделение: средства можно снимать через банкомат.</p>
+              </div>
+
+              <div class="vip-card">
+                <div class="vip-icon">🤝</div>
+                <h3>Встречи с руководством</h3>
+                <p>Видео или личная встреча с руководством. Разбор портфеля, планов, результатов. Диалог руководителей, не отчёт.</p>
+              </div>
+            </div>
+
+            <p class="fine">Карта к спецсчёту — планируемый сервис для клиентов ВИП-партнёров. Дату запуска и технические условия сообщим отдельно. Информация носит справочный характер и не является публичной офертой.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 -->
+      <section class="slide dark center" id="s9">
+        <div class="wrap">
+          <h1>Передайте 3 дела —<br><span class="hl">и сами всё увидите</span></h1>
+          <p class="lead">Не надо верить на слово. Просто попробуйте. Личный кабинет, персональный сопроводитель, прозрачная сверка. Дальше решите сами.</p>
+          <div class="cta">
+            <a class="btn gold" href="https://t.me/moroz_viktor" target="_blank" rel="noopener">Оставить заявку</a>
+            <a class="btn ghost" href="tel:+79995534474">Позвонить Виктору</a>
+            <a class="btn ghost" href="mailto:mvgoz@yandex.ru">Написать на почту</a>
+          </div>
+          <div class="contacts">
+            <b>Виктор Мороз</b> · Руководитель отдела продаж<br>
+            +7 999 553-44-74 · mvgoz@yandex.ru · @moroz_viktor<br>
+            arbitrpro.ru · client.arbitrpro.ru
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var track = document.getElementById('track');
+      var stage = document.getElementById('stage');
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      var currentPage = document.getElementById('currentPage');
+      var totalPages = document.getElementById('totalPages');
+      var progress = document.getElementById('progress');
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+      var index = 0;
+
+      totalPages.textContent = String(slides.length).padStart(2, '0');
+
+      function goTo(nextIndex) {
+        index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        track.style.transform = 'translate3d(' + (-index * 100) + '%,0,0)';
+        currentPage.textContent = String(index + 1).padStart(2, '0');
+        progress.style.width = ((index + 1) / slides.length * 100) + '%';
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === slides.length - 1;
+
+        try {
+          history.replaceState(null, '', '#s' + (index + 1));
+        } catch (e) {}
+
+        slides.forEach(function (slide, i) {
+          slide.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+        });
+      }
+
+      prevBtn.addEventListener('click', function () {
+        goTo(index - 1);
+      });
+
+      nextBtn.addEventListener('click', function () {
+        goTo(index + 1);
+      });
+
+      document.querySelectorAll('[data-go]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          goTo(parseInt(btn.getAttribute('data-go'), 10));
+        });
+      });
+
+      var touchState = null;
+
+      stage.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        var target = e.target;
+        touchState = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          interactive: !!(target.closest && target.closest('.calc, input, button, a, .nav-controls'))
+        };
+      }, { passive: true });
+
+      stage.addEventListener('touchend', function (e) {
+        if (!touchState || touchState.interactive) {
+          touchState = null;
+          return;
+        }
+
+        var endX = e.changedTouches[0].clientX;
+        var endY = e.changedTouches[0].clientY;
+        var dx = endX - touchState.x;
+        var dy = endY - touchState.y;
+
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+          goTo(index + (dx < 0 ? 1 : -1));
+        }
+
+        touchState = null;
+      }, { passive: true });
+
+      window.addEventListener('keydown', function (e) {
+        if (['INPUT', 'TEXTAREA', 'SELECT'].indexOf(e.target.tagName) !== -1) return;
+
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          goTo(index + 1);
+        }
+
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          goTo(index - 1);
+        }
+      });
+
+      var wheelLock = false;
+      stage.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) + 5) return;
+        if (wheelLock) return;
+
+        wheelLock = true;
+        setTimeout(function () { wheelLock = false; }, 650);
+
+        goTo(index + (e.deltaX > 0 ? 1 : -1));
+      }, { passive: true });
+
+      var hashMatch = location.hash.match(/^#s(\d+)$/);
+      if (hashMatch) {
+        index = parseInt(hashMatch[1], 10) - 1;
+      }
+
+      goTo(index);
+
+      var volSlider = document.getElementById('volSlider');
+      var volValue = document.getElementById('volValue');
+      var bonusPerCaseEl = document.getElementById('bonusPerCase');
+      var bonusMonthlyEl = document.getElementById('bonusMonthly');
+      var cashbackCaseEl = document.getElementById('cashbackCase');
+      var cashbackConditionEl = document.getElementById('cashbackCondition');
+      var totalPayoutEl = document.getElementById('totalPayout');
+      var cashbox = document.getElementById('cashbox');
+      var assetButtons = Array.prototype.slice.call(document.querySelectorAll('.asset-btn'));
+      var currentAsset = 0;
+
+      function rub(amount) {
+        return Math.round(amount).toLocaleString('ru-RU') + ' ₽';
+      }
+
+      function calculate() {
+        var volume = parseInt(volSlider.value, 10);
+        var bonusPerCase = volume >= 50 ? 3000 : 2000;
+        var monthlyBonus = volume * bonusPerCase;
+
+        var reward = currentAsset * 0.07;
+        var share = 0;
+
+        if (currentAsset > 0) {
+          if (volume >= 50) {
+            share = 0.5;
+          } else if (currentAsset <= 1500000) {
+            share = 0.2;
+          } else if (currentAsset <= 3000000) {
+            share = 0.3;
+          } else if (currentAsset <= 5000000) {
+            share = 0.4;
+          } else {
+            share = 0.5;
+          }
+        }
+
+        var cashback = reward * share;
+        var total = monthlyBonus + cashback;
+
+        volValue.textContent = volume;
+        bonusPerCaseEl.textContent = rub(bonusPerCase);
+        bonusMonthlyEl.textContent = rub(monthlyBonus);
+        cashbackCaseEl.textContent = rub(cashback);
+        cashbackConditionEl.textContent = volume >= 50 ? '50% фикс' : '20–50%';
+        totalPayoutEl.textContent = '+' + rub(total);
+        cashbox.classList.toggle('show', volume >= 50);
+      }
+
+      assetButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          assetButtons.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          currentAsset = parseInt(btn.getAttribute('data-asset'), 10);
+          calculate();
+        });
+      });
+
+      volSlider.addEventListener('input', calculate);
+      calculate();
+    })();
+  </script>
+</body>
+</html>
