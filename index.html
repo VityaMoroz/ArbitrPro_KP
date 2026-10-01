@@ -18,8 +18,9 @@
     --intro-dur: 1.6s;
     --intro-ease: cubic-bezier(0.72, 0, 0.28, 1);
     --circle-cx: 20vw;
-    --circle-size: 38vmin;
+    --circle-size: 28.2vmin;
     --logo-size: 30vmin;
+    --arc-shift: 0.1vmin;
     --line: rgba(190,172,140,0.28);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -60,45 +61,62 @@
   }
   .intro.expanding .intro-black { transform: translate(-50%, -50%) rotate(45deg) scale(10); }
 
-  /* ЛОГО */
+  /* КРУГ-ЛОГО */
   .pp-logo {
     position: fixed; top: 50%; left: 50%; width: 30vmin; height: 30vmin;
     transform: translate(-50%, -50%); z-index: 110; pointer-events: none;
     transition: top var(--intro-dur) var(--intro-ease), left var(--intro-dur) var(--intro-ease),
                 width var(--intro-dur) var(--intro-ease), height var(--intro-dur) var(--intro-ease),
-                opacity 0.4s ease;
+                opacity 0.6s ease, filter 0.6s ease;
   }
   .pp-logo .logo-diamond {
     position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
     background: var(--gold); transform: translate(-50%, -50%) rotate(45deg);
-    transition: background var(--intro-dur) var(--intro-ease), opacity var(--intro-dur) ease;
+    /* Длительность = intro-dur, чтобы растворялся синхронно с ростом зелёного ромба */
+    transition: background var(--intro-dur) var(--intro-ease),
+                opacity var(--intro-dur) ease;
+    z-index: -1;
+    opacity: 1;
   }
   .pp-logo .logo-circle {
     position: absolute; top: 50%; left: 50%; width: 72%; height: 72%;
     transform: translate(-50%, -50%); object-fit: contain;
     transition: width var(--intro-dur) var(--intro-ease), height var(--intro-dur) var(--intro-ease);
+    position: relative;
+    z-index: 1;
   }
   .pp-logo.on-title { top: 50%; left: var(--circle-cx); width: var(--logo-size); height: var(--logo-size); }
   .pp-logo.on-title .logo-circle { width: 100%; height: 100%; }
-  .pp-logo.on-title .logo-diamond { background: var(--green); opacity: 0; }
+  /* Бежевый ромб ПЛАВНО растворяется — без display: none */
+  .pp-logo.on-title .logo-diamond { opacity: 0; }
+
+  .pp-logo.fading { opacity: 0; filter: blur(1px); }
   .pp-logo.hidden-in-wheel { opacity: 0; }
 
   /* ДУГА */
   .arc {
     position: absolute; border: 1px solid rgba(190,172,140,0.35); border-radius: 50%;
-    pointer-events: none; z-index: 30; top: 50%; left: var(--circle-cx);
+    pointer-events: none; z-index: 30;
+    top: 50%; left: calc(var(--circle-cx) + var(--arc-shift));
     width: var(--circle-size); height: var(--circle-size);
     margin-top: calc(var(--circle-size) / -2); margin-left: calc(var(--circle-size) / -2);
     opacity: 0;
     transition: top 1s cubic-bezier(0.72, 0, 0.28, 1), left 1s cubic-bezier(0.72, 0, 0.28, 1),
                 width 1s cubic-bezier(0.72, 0, 0.28, 1), height 1s cubic-bezier(0.72, 0, 0.28, 1),
-                margin 1s cubic-bezier(0.72, 0, 0.28, 1), opacity var(--intro-dur) ease;
+                margin 1s cubic-bezier(0.72, 0, 0.28, 1),
+                opacity 0.6s ease, filter 0.6s ease, border-color 0.6s ease;
   }
   .arc.visible { opacity: 1; }
-  .arc.expanded { top: 50%; left: -78vw; width: 106vw; height: 106vw; margin-top: -53vw; margin-left: 0; }
+  .arc.fading { opacity: 0.35; filter: blur(0.5px); border-color: rgba(190,172,140,0.6); }
+  .arc.expanded {
+    top: 50%; left: -78vw; width: 106vw; height: 106vw;
+    margin-top: -53vw; margin-left: 0;
+    filter: none; opacity: 1; border-color: rgba(190,172,140,0.35);
+  }
   .arc-fill {
     position: absolute; background: var(--green-deep); border-radius: 50%;
-    pointer-events: none; z-index: 20; top: 50%; left: var(--circle-cx);
+    pointer-events: none; z-index: 20;
+    top: 50%; left: calc(var(--circle-cx) + var(--arc-shift));
     width: var(--circle-size); height: var(--circle-size);
     margin-top: calc(var(--circle-size) / -2); margin-left: calc(var(--circle-size) / -2);
     opacity: 0;
@@ -107,6 +125,45 @@
                 margin 1s cubic-bezier(0.72, 0, 0.28, 1), opacity 0.4s ease;
   }
   .arc-fill.expanded { top: 50%; left: -78vw; width: 106vw; height: 106vw; margin-top: -53vw; margin-left: 0; opacity: 1; }
+
+  /* РАЗМЫТЫЙ КРУГ НА ПОДЛОЖКЕ */
+  .bg-blur-circle {
+    position: absolute;
+    top: 50%; left: calc(var(--circle-cx) + var(--arc-shift));
+    width: var(--circle-size); height: var(--circle-size);
+    margin-top: calc(var(--circle-size) / -2); margin-left: calc(var(--circle-size) / -2);
+    background-image: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/main/%D0%9A%D1%80%D1%83%D0%B3.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    filter: blur(2.2px);
+    pointer-events: none;
+    z-index: 22;
+    transition: top 1s cubic-bezier(0.72, 0, 0.28, 1), left 1s cubic-bezier(0.72, 0, 0.28, 1),
+                width 1s cubic-bezier(0.72, 0, 0.28, 1), height 1s cubic-bezier(0.72, 0, 0.28, 1),
+                margin 1s cubic-bezier(0.72, 0, 0.28, 1),
+                opacity 1.4s ease;
+  }
+  .bg-blur-circle.visible { opacity: 0.22; }
+  .bg-blur-circle.expanded {
+    top: 50%; left: -78vw; width: 106vw; height: 106vw;
+    margin-top: -53vw; margin-left: 0;
+  }
+
+  /* ЦЕЛЬНЫЙ ЛОГО В УГЛУ */
+  .brand-corner {
+    position: fixed;
+    top: 24px; left: 24px;
+    height: 5.5vmin;
+    width: auto;
+    z-index: 115;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.5s ease 0.15s, transform 0.7s cubic-bezier(0.72, 0, 0.28, 1) 0.15s;
+  }
+  .brand-corner.visible { opacity: 1; transform: translateX(0); }
 
   /* ТИТУЛЬНЫЙ */
   .title-slide { position: absolute; inset: 0; display: flex; z-index: 5; pointer-events: none; transition: opacity 0.6s ease; }
@@ -166,8 +223,31 @@
   .wheel-item.active .triangle { opacity: 1; }
   .wheel-item.active { color: var(--cream) !important; font-weight: 700; }
 
+  /* ПОДЛОЖКА МЕНЮ */
+  .menu-backdrop {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 22vw;
+    z-index: 5;
+    pointer-events: none;
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    -webkit-mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
+    mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
+  }
+  .menu-backdrop.visible { opacity: 1; }
+
   /* ПРАВАЯ ЗОНА */
-  .right-zone { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.8s ease; }
+  .right-zone {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
   .right-zone.visible { opacity: 1; pointer-events: auto; }
   .right-slides { position: absolute; inset: 0; pointer-events: none; }
   .card-slot {
@@ -181,12 +261,10 @@
   .card-slot::-webkit-scrollbar { width: 6px; }
   .card-slot::-webkit-scrollbar-thumb { background: rgba(190,172,140,0.4); border-radius: 3px; }
   .card-slot.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
-
-  /* Центрированный слайд (контакты) */
   .card-slot.centered { top: 50%; transform: translate(-130vw, -50%); }
   .card-slot.centered.active { transform: translate(0, -50%); }
 
-  /* ЗАГОЛОВОК */
+  /* ЗАГОЛОВОК СЛАЙДА */
   .slide-title {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(28px, 2.9vw, 48px); font-weight: 700; line-height: 1.05;
@@ -194,7 +272,6 @@
     text-transform: uppercase; max-width: 24ch;
   }
   .slide-title .hl { color: var(--gold); }
-
   .slide-lead {
     font-family: 'Inter', sans-serif; font-size: clamp(13px, 1vw, 16px);
     line-height: 1.5; color: rgba(247,235,221,0.75); margin-bottom: 20px; max-width: 70ch;
@@ -334,12 +411,18 @@
          alt="АрбитрПро">
   </div>
 
+  <div class="bg-blur-circle" id="bgBlurCircle"></div>
+
+  <img class="brand-corner" id="brandCorner"
+       src="https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/main/ARBITR-PRO_1080%C3%97420px.png"
+       alt="АрбитрПро">
+
   <div class="arc" id="arc"></div>
 
   <div class="title-slide" id="titleSlide">
     <div class="title-left"></div>
     <div class="title-right" id="titleRight">
-      <img class="title-logo-text"
+      <img class="title-logo-text" id="titleLogoText"
            src="https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/main/%D0%9D%D0%B0%D0%B4%D0%BF%D0%B8%D1%81%D1%8C.png"
            alt="АрбитрПро">
       <div class="title-main">Сделайте направление АУ прибыльным — без головной боли</div>
@@ -349,6 +432,9 @@
   </div>
 
   <div class="arc-fill" id="arcFill"></div>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+
   <div class="right-zone" id="rightZone">
     <div class="right-slides" id="rightSlides"></div>
   </div>
@@ -625,10 +711,13 @@ slides.forEach((s, i) => {
   calculate();
 })();
 
-/* ИНТРО — автозапуск + клик */
+/* ИНТРО */
 const intro = document.getElementById('intro');
 const ppLogo = document.getElementById('ppLogo');
 const arc = document.getElementById('arc');
+const bgBlurCircle = document.getElementById('bgBlurCircle');
+const brandCorner = document.getElementById('brandCorner');
+const menuBackdrop = document.getElementById('menuBackdrop');
 let introStarted = false;
 
 function startIntro() {
@@ -648,12 +737,7 @@ function startIntro() {
   }, 2000);
 }
 
-/* Автозапуск через 800 мс после полной загрузки */
-window.addEventListener('load', () => {
-  setTimeout(startIntro, 800);
-});
-
-/* Клик или тап в любом месте — старт сразу (если ещё не начали) */
+window.addEventListener('load', () => setTimeout(startIntro, 800));
 document.addEventListener('click', startIntro);
 document.addEventListener('touchstart', startIntro, { passive: true });
 
@@ -695,24 +779,44 @@ function goTo(n) {
 
   if (n === -1) {
     arcEl.classList.remove('expanded');
+    arcEl.classList.remove('fading');
     arcFill.classList.remove('expanded');
+    bgBlurCircle.classList.remove('expanded');
+    bgBlurCircle.classList.remove('visible');
     wm.classList.remove('visible');
     rz.classList.remove('visible');
+    menuBackdrop.classList.remove('visible');
+    ppLogo.classList.remove('fading');
     ppLogo.classList.remove('hidden-in-wheel');
+    ppLogo.classList.add('on-title');
+    brandCorner.classList.remove('visible');
     document.getElementById('titleSlide').classList.remove('gone');
     wheelVisible = false;
     return;
   }
 
   if (!wheelVisible) {
+    arcEl.classList.add('fading');
+    ppLogo.classList.add('fading');
+
     wm.classList.add('visible');
     rz.classList.add('visible');
     document.getElementById('titleSlide').classList.add('gone');
-    ppLogo.classList.add('hidden-in-wheel');
+    brandCorner.classList.add('visible');
+    bgBlurCircle.classList.add('visible');
+    menuBackdrop.classList.add('visible');
+
     setTimeout(() => {
+      ppLogo.classList.remove('fading');
+      ppLogo.classList.add('hidden-in-wheel');
       arcEl.classList.add('expanded');
-      arcFill.classList.add('expanded');
-    }, 250);
+      bgBlurCircle.classList.add('expanded');
+    }, 400);
+
+    setTimeout(() => {
+      arcEl.classList.remove('fading');
+    }, 1200);
+
     wheelVisible = true;
   }
 
