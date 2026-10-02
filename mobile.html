@@ -68,8 +68,8 @@
 
   /* КРУГ-ЛОГО НА ТИТУЛЬНОМ */
   .pp-logo {
-    position: fixed; top: 26vh; left: 50vw;
-    width: 32vmin; height: 32vmin;
+    position: fixed; top: 24vh; left: 50vw;
+    width: 30vmin; height: 30vmin;
     transform: translate(-50%, -50%);
     z-index: 110;
     pointer-events: none;
@@ -102,9 +102,9 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 30;
-    top: 26vh; left: 50vw;
-    width: 30vmin; height: 30vmin;
-    margin-top: -15vmin; margin-left: -15vmin;
+    top: 24vh; left: 50vw;
+    width: 28vmin; height: 28vmin;
+    margin-top: -14vmin; margin-left: -14vmin;
     opacity: 0;
     transition: top var(--sync-dur) var(--sync-ease),
                 left var(--sync-dur) var(--sync-ease),
@@ -139,35 +139,43 @@
   .title-slide {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
-    padding: 70px 20px 40px;
+    padding: 20px 20px 40px;
     z-index: 5;
     pointer-events: none;
     transition: opacity 0.6s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .title-slide.gone { opacity: 0; }
-  .title-left { width: 100%; height: 40vh; margin-bottom: 20px; }
+  .title-left { width: 100%; height: 42vh; flex-shrink: 0; }
   .title-right {
-    width: 100%; padding: 0 20px; text-align: center; align-items: center;
-    display: flex; flex-direction: column; justify-content: center;
+    width: 100%; padding: 0 4px; text-align: center; align-items: center;
+    display: flex; flex-direction: column; justify-content: flex-start;
     transform: translateY(40px); opacity: 0;
     transition: transform 1.2s cubic-bezier(0.2,1,0.3,1) 0.2s, opacity 0.9s ease 0.2s;
   }
   .title-right.entered { transform: translateY(0); opacity: 1; }
-  .title-logo-text { height: 6vmin; margin-bottom: 20px; align-self: center; }
+  .title-logo-text { height: 6vmin; margin-bottom: 22px; align-self: center; }
   .title-main {
     font-family: 'Myriad Pro', sans-serif;
-    font-size: clamp(28px, 8vw, 42px); font-weight: 600;
-    text-align: center; line-height: 1.15; margin-bottom: 16px;
+    font-size: clamp(26px, 7.2vw, 36px); font-weight: 600;
+    text-align: center; line-height: 1.25;
+    margin: 0 0 22px;
     text-transform: uppercase; color: var(--cream);
   }
-  .title-sub { font-family: 'Inter', sans-serif; font-size: clamp(13px, 3.5vw, 16px); text-align: center; color: var(--gold); font-weight: 500; }
+  .title-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(13px, 3.4vw, 15px);
+    text-align: center;
+    color: var(--gold);
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 26px;
+  }
   .title-badge {
-    position: fixed;
-    bottom: 130px; left: 50%;
-    transform: translateX(-50%) translateY(60px);
-    opacity: 0;
+    display: inline-block;
     padding: 10px 18px;
-    font-size: 12px;
+    font-size: 11px;
     background: rgba(190,172,140,0.08);
     border: 1px solid rgba(190,172,140,0.3);
     border-radius: 4px;
@@ -177,11 +185,12 @@
     text-transform: uppercase;
     letter-spacing: 1.5px;
     white-space: nowrap;
-    z-index: 6;
-    pointer-events: none;
-    transition: transform 1.2s cubic-bezier(0.2,1,0.3,1) 0.4s, opacity 0.9s ease 0.4s;
+    align-self: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: transform 0.9s cubic-bezier(0.2,1,0.3,1) 0.5s, opacity 0.8s ease 0.5s;
   }
-  .title-badge.entered { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .title-badge.entered { transform: translateY(0); opacity: 1; }
 
   /* МЕНЮ СНИЗУ */
   .wheel-menu {
@@ -414,8 +423,8 @@
            alt="АрбитрПро">
       <div class="title-main">Сделайте направление АУ прибыльным — без головной боли</div>
       <div class="title-sub">6 лет на рынке · 4 000+ дел · Партнёры по всей России</div>
+      <div class="title-badge" id="titleBadge">Передайте 3 дела — и сами увидите</div>
     </div>
-    <div class="title-badge" id="titleBadge">Передайте 3 дела — и сами увидите</div>
   </div>
 
   <div class="wheel-backdrop" id="wheelBackdrop"></div>
@@ -743,7 +752,6 @@ function goTo(n) {
   }
 
   if (!wheelVisible) {
-    // Синхронно: круг уезжает вниз + цельный лого въезжает снизу + дуга растягивается
     ppLogo.classList.add('in-corner-mobile');
     brandCorner.classList.add('visible');
     arc.classList.add('expanded');
@@ -767,21 +775,32 @@ function goTo(n) {
   });
 }
 
-/* СВАЙП */
+/* ТАП ПО ТИТУЛЬНОМУ → переход к первому разделу */
+document.getElementById('titleSlide').addEventListener('click', (e) => {
+  if (current === -1) {
+    goTo(0);
+  }
+});
+
+/* СВАЙП — только от середины экрана, края не перехватываем */
 const deck = document.getElementById('deck');
+const EDGE_GUARD = 40;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchStartTime = 0;
 let swipeDirection = null;
+let fromEdge = false;
 const SWIPE_MIN_DISTANCE = 60;
 const SWIPE_MAX_TIME = 600;
 
 deck.addEventListener('touchstart', (e) => {
   if (e.touches.length !== 1) return;
-  touchStartX = e.touches[0].clientX;
+  const x = e.touches[0].clientX;
+  touchStartX = x;
   touchStartY = e.touches[0].clientY;
   touchStartTime = Date.now();
   swipeDirection = null;
+  fromEdge = (x < EDGE_GUARD) || (x > window.innerWidth - EDGE_GUARD);
 }, { passive: true });
 
 deck.addEventListener('touchmove', (e) => {
@@ -796,6 +815,7 @@ deck.addEventListener('touchmove', (e) => {
 
 deck.addEventListener('touchend', (e) => {
   if (e.changedTouches.length !== 1) return;
+  if (fromEdge) return;
   if (swipeDirection !== 'horizontal') return;
   const dx = e.changedTouches[0].clientX - touchStartX;
   const dy = e.changedTouches[0].clientY - touchStartY;
@@ -804,11 +824,9 @@ deck.addEventListener('touchend', (e) => {
   if (Math.abs(dx) < SWIPE_MIN_DISTANCE) return;
   if (Math.abs(dx) < Math.abs(dy)) return;
   if (dx < 0) {
-    // свайп влево → следующий
     if (current === -1) goTo(0);
     else if (current < totalSlides - 1) goTo(current + 1);
   } else {
-    // свайп вправо → предыдущий
     if (current > 0) goTo(current - 1);
     else if (current === 0) goTo(-1);
   }
