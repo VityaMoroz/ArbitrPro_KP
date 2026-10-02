@@ -66,7 +66,7 @@
   }
   .intro.expanding .intro-black { transform: translate(-50%, -50%) rotate(45deg) scale(10); }
 
-  /* КРУГ-ЛОГО — стартует из центра, едет в финальную точку ОДНОВРЕМЕННО с ромбом */
+  /* КРУГ-ЛОГО — на титульном и в меню */
   .pp-logo {
     position: fixed;
     top: 50%; left: 50%;
@@ -87,13 +87,11 @@
     transform: translate(-50%, -50%); object-fit: contain;
     z-index: 1;
   }
-  /* Состояние "на титульном" — активируется через JS сразу после старта интро */
   .pp-logo.on-title {
-    top: 24vh; left: 50vw;
-    width: 30vmin; height: 30vmin;
+    top: 22vh; left: 50vw;
+    width: 28vmin; height: 28vmin;
     opacity: 1;
   }
-  /* Состояние "в меню" — уезжает вниз, растёт, блюрится */
   .pp-logo.in-corner-mobile {
     top: 117vh; left: 50vw;
     width: 90vh; height: 90vh;
@@ -102,7 +100,7 @@
     z-index: 15;
   }
 
-  /* ДУГА — стартует из центра, едет вместе с кругом */
+  /* ДУГА — стартует из центра вместе с лого, на титульном становится вокруг лого */
   .arc {
     position: fixed;
     border: 2px solid rgba(190,172,140,0.65);
@@ -110,8 +108,8 @@
     pointer-events: none;
     z-index: 30;
     top: 50%; left: 50%;
-    width: 28vmin; height: 28vmin;
-    margin-top: -14vmin; margin-left: -14vmin;
+    width: 32vmin; height: 32vmin;
+    margin-top: -16vmin; margin-left: -16vmin;
     opacity: 0;
     transition: top var(--intro-dur) var(--intro-ease),
                 left var(--intro-dur) var(--intro-ease),
@@ -120,7 +118,13 @@
                 margin var(--intro-dur) var(--intro-ease),
                 opacity var(--sync-dur) var(--sync-ease);
   }
-  .arc.visible { opacity: 1; }
+  /* На титульном дуга совпадает с лого */
+  .arc.on-title {
+    top: 22vh; left: 50vw;
+    width: 30vmin; height: 30vmin;
+    margin-top: -15vmin; margin-left: -15vmin;
+    opacity: 1;
+  }
   .arc.expanded {
     top: 117vh; left: 50vw;
     width: 70vh; height: 70vh;
@@ -199,21 +203,19 @@
   }
   .title-badge.entered { transform: translateY(0); opacity: 1; }
 
-  /* МЕНЮ СНИЗУ */
+  /* МЕНЮ — контейнер на весь экран, прозрачный, только для пунктов */
   .wheel-menu {
     position: fixed;
-    left: 0; right: 0; bottom: 0;
-    width: 100%; height: 40vh;
-    overflow: visible;
+    inset: 0;
+    width: 100vw; height: 100vh;
     z-index: 50;
+    pointer-events: none;
     opacity: 0;
     transition: opacity 0.6s ease;
-    pointer-events: auto;
   }
   .wheel-menu.visible { opacity: 1; }
 
-  /* ПУНКТЫ МЕНЮ — внутри контейнера, без position: fixed.
-     Позиция задаётся переменными --x, --y и translate3d. */
+  /* ПУНКТЫ МЕНЮ — абсолютные внутри .wheel-menu (он на весь экран) */
   .wheel-item {
     position: absolute;
     left: 0; top: 0;
@@ -686,7 +688,7 @@ slides.forEach((s, i) => {
   calculate();
 })();
 
-/* ИНТРО — круг-лого и дуга стартуют из центра, одновременно с ромбом едут в финальную точку */
+/* ИНТРО */
 const intro = document.getElementById('intro');
 const ppLogo = document.getElementById('ppLogo');
 const arc = document.getElementById('arc');
@@ -698,9 +700,9 @@ function startIntro() {
   if (introStarted) return;
   introStarted = true;
   intro.classList.add('expanding');
-  arc.classList.add('visible');
-  // Одновременно с ромбом круг-лого едет из центра в финальную точку
+  /* Одновременно с ромбом лого и дуга едут из центра в титульную позицию */
   ppLogo.classList.add('on-title');
+  arc.classList.add('on-title');
   setTimeout(() => {
     intro.classList.add('hidden');
     document.getElementById('titleRight').classList.add('entered');
@@ -716,9 +718,7 @@ let current = -1;
 const totalSlides = slides.length;
 let wheelVisible = false;
 
-/* ПУНКТЫ МЕНЮ — под дугой.
-   Позиция задаётся через CSS-переменные --x и --y, никаких left/top.
-   Пункты живут внутри .wheel-menu (position: absolute). */
+/* ПУНКТЫ МЕНЮ */
 function positionWheelItem(el, offset) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -760,6 +760,7 @@ function goTo(n) {
 
   if (n === -1) {
     arc.classList.remove('expanded');
+    arc.classList.remove('on-title');
     wm.classList.remove('visible');
     rz.classList.remove('visible');
     wheelBackdrop.classList.remove('visible');
@@ -775,8 +776,9 @@ function goTo(n) {
   if (!wheelVisible) {
     ppLogo.classList.remove('on-title');
     ppLogo.classList.add('in-corner-mobile');
-    brandCorner.classList.add('visible');
+    arc.classList.remove('on-title');
     arc.classList.add('expanded');
+    brandCorner.classList.add('visible');
 
     setTimeout(() => {
       wm.classList.add('visible');
@@ -853,9 +855,6 @@ deck.addEventListener('touchend', (e) => {
 }, { passive: true });
 
 window.addEventListener('resize', () => { refreshMenuPositions(); });
-
-/* Первичная расстановка пунктов меню */
-refreshMenuPositions();
 </script>
 </body>
 </html>
