@@ -4,58 +4,13 @@
 <meta charset="UTF-8">
 <title>АрбитрПро – Презентация</title>
 <style>
-  /* ============================================================
-     ШРИФТЫ — локальные, из репозитория
-     ============================================================ */
-  @font-face {
-    font-family: 'Myriad Pro';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/MYRIADPRO-REGULAR.OTF') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Myriad Pro';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/MYRIADPRO-SEMIBOLD.OTF') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Myriad Pro';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/MYRIADPRO-BOLD.OTF') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Inter';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Inter';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-Medium.otf') format('opentype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Inter';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-SemiBold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Inter';
-    src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-  }
+  @font-face { font-family: 'Myriad Pro'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/MYRIADPRO-REGULAR.OTF') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Myriad Pro'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/MYRIADPRO-SEMIBOLD.OTF') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Myriad Pro'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/MYRIADPRO-BOLD.OTF') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-SemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('https://raw.githubusercontent.com/VityaMoroz/ArbitrPRO/VityaMoroz-patch-1/Inter-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
 
   :root {
     --green: #19322E;
@@ -148,16 +103,16 @@
     width: var(--circle-size); height: var(--circle-size);
     margin-top: calc(var(--circle-size) / -2); margin-left: calc(var(--circle-size) / -2);
     opacity: 0;
-    transition: top 1s cubic-bezier(0.72, 0, 0.28, 1), left 1s cubic-bezier(0.72, 0, 0.28, 1),
-                width 1s cubic-bezier(0.72, 0, 0.28, 1), height 1s cubic-bezier(0.72, 0, 0.28, 1),
-                margin 1s cubic-bezier(0.72, 0, 0.28, 1),
+    transition: top var(--intro-dur) var(--intro-ease), left var(--intro-dur) var(--intro-ease),
+                width var(--intro-dur) var(--intro-ease), height var(--intro-dur) var(--intro-ease),
+                margin var(--intro-dur) var(--intro-ease),
                 opacity 0.6s ease, filter 0.6s ease, border-color 0.6s ease;
   }
   .arc.visible { opacity: 1; }
   .arc.fading { opacity: 0.35; filter: blur(0.5px); border-color: rgba(190,172,140,0.6); }
   .arc.expanded {
-    top: 50%; left: -78vw; width: 106vw; height: 106vw;
-    margin-top: -53vw; margin-left: 0;
+    top: 50%; left: -95vw; width: 116vw; height: 116vw;
+    margin-top: -58vw; margin-left: 0;
     filter: none; opacity: 1; border-color: rgba(190,172,140,0.35);
   }
   .arc-fill {
@@ -167,11 +122,11 @@
     width: var(--circle-size); height: var(--circle-size);
     margin-top: calc(var(--circle-size) / -2); margin-left: calc(var(--circle-size) / -2);
     opacity: 0;
-    transition: top 1s cubic-bezier(0.72, 0, 0.28, 1), left 1s cubic-bezier(0.72, 0, 0.28, 1),
-                width 1s cubic-bezier(0.72, 0, 0.28, 1), height 1s cubic-bezier(0.72, 0, 0.28, 1),
-                margin 1s cubic-bezier(0.72, 0, 0.28, 1), opacity 0.4s ease;
+    transition: top var(--intro-dur) var(--intro-ease), left var(--intro-dur) var(--intro-ease),
+                width var(--intro-dur) var(--intro-ease), height var(--intro-dur) var(--intro-ease),
+                margin var(--intro-dur) var(--intro-ease), opacity 0.4s ease;
   }
-  .arc-fill.expanded { top: 50%; left: -78vw; width: 106vw; height: 106vw; margin-top: -53vw; margin-left: 0; opacity: 1; }
+  .arc-fill.expanded { top: 50%; left: -95vw; width: 116vw; height: 116vw; margin-top: -58vw; margin-left: 0; opacity: 1; }
 
   /* РАЗМЫТЫЙ КРУГ */
   .bg-blur-circle {
@@ -187,15 +142,15 @@
     filter: blur(2.2px);
     pointer-events: none;
     z-index: 22;
-    transition: top 1s cubic-bezier(0.72, 0, 0.28, 1), left 1s cubic-bezier(0.72, 0, 0.28, 1),
-                width 1s cubic-bezier(0.72, 0, 0.28, 1), height 1s cubic-bezier(0.72, 0, 0.28, 1),
-                margin 1s cubic-bezier(0.72, 0, 0.28, 1),
+    transition: top var(--intro-dur) var(--intro-ease), left var(--intro-dur) var(--intro-ease),
+                width var(--intro-dur) var(--intro-ease), height var(--intro-dur) var(--intro-ease),
+                margin var(--intro-dur) var(--intro-ease),
                 opacity 1.4s ease;
   }
   .bg-blur-circle.visible { opacity: 0.22; }
   .bg-blur-circle.expanded {
-    top: 50%; left: -78vw; width: 106vw; height: 106vw;
-    margin-top: -53vw; margin-left: 0;
+    top: 50%; left: -95vw; width: 116vw; height: 116vw;
+    margin-top: -58vw; margin-left: 0;
   }
 
   /* ЦЕЛЬНЫЙ ЛОГО В УГЛУ */
@@ -213,7 +168,7 @@
   .brand-corner.visible { opacity: 1; transform: translateX(0); }
 
   /* ТИТУЛЬНЫЙ */
-  .title-slide { position: absolute; inset: 0; display: flex; z-index: 5; pointer-events: none; transition: opacity 0.6s ease; }
+  .title-slide { position: absolute; inset: 0; display: flex; z-index: 5; pointer-events: none; transition: opacity var(--intro-dur) ease; }
   .title-slide.gone { opacity: 0; }
   .title-left { width: 42%; }
   .title-right {
@@ -245,7 +200,7 @@
   .wheel-menu {
     position: absolute; left: 0; top: 0; width: 28vw; height: 100vh;
     z-index: 28; pointer-events: none; overflow: visible; opacity: 0;
-    transition: opacity 0.8s ease;
+    transition: opacity var(--intro-dur) ease;
   }
   .wheel-menu.visible { opacity: 1; pointer-events: auto; }
   .wheel-item {
@@ -280,7 +235,7 @@
     backdrop-filter: blur(1.5px);
     -webkit-backdrop-filter: blur(1.5px);
     opacity: 0;
-    transition: opacity 0.8s ease;
+    transition: opacity var(--intro-dur) ease;
     -webkit-mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
     mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
   }
@@ -292,22 +247,22 @@
     overflow: hidden;
     z-index: 1;
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.8s ease;
   }
-  .right-zone.visible { opacity: 1; pointer-events: auto; }
+  .right-zone.visible { pointer-events: auto; }
   .right-slides { position: absolute; inset: 0; pointer-events: none; }
+
+  /* СЛАЙД */
   .card-slot {
     position: absolute; top: 8vh; left: calc(28vw + 3vw);
     width: calc(72vw - 6vw); max-height: 84vh;
     overflow-y: auto; overflow-x: hidden; padding-right: 8px;
-    transform: translateX(-130vw); opacity: 0; pointer-events: none;
-    transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s ease;
+    transform: translateX(-130vw); pointer-events: none;
+    transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
     scrollbar-width: thin; scrollbar-color: rgba(190,172,140,0.4) transparent;
   }
   .card-slot::-webkit-scrollbar { width: 6px; }
   .card-slot::-webkit-scrollbar-thumb { background: rgba(190,172,140,0.4); border-radius: 3px; }
-  .card-slot.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
+  .card-slot.active { transform: translateX(0); pointer-events: auto; }
   .card-slot.centered { top: 50%; transform: translate(-130vw, -50%); }
   .card-slot.centered.active { transform: translate(0, -50%); }
 
@@ -838,31 +793,29 @@ function goTo(n) {
     ppLogo.classList.add('on-title');
     brandCorner.classList.remove('visible');
     document.getElementById('titleSlide').classList.remove('gone');
+    document.querySelectorAll('.card-slot').forEach(el => el.classList.remove('active'));
     wheelVisible = false;
     return;
   }
 
   if (!wheelVisible) {
-    arcEl.classList.add('fading');
-    ppLogo.classList.add('fading');
-
-    wm.classList.add('visible');
-    rz.classList.add('visible');
-    document.getElementById('titleSlide').classList.add('gone');
-    brandCorner.classList.add('visible');
+    arcEl.classList.add('expanded');
     bgBlurCircle.classList.add('visible');
+    bgBlurCircle.classList.add('expanded');
+    ppLogo.classList.add('fading');
+    brandCorner.classList.add('visible');
+    wm.classList.add('visible');
     menuBackdrop.classList.add('visible');
+    document.getElementById('titleSlide').classList.add('gone');
+
+    setTimeout(() => {
+      rz.classList.add('visible');
+    }, 1400);
 
     setTimeout(() => {
       ppLogo.classList.remove('fading');
       ppLogo.classList.add('hidden-in-wheel');
-      arcEl.classList.add('expanded');
-      bgBlurCircle.classList.add('expanded');
-    }, 400);
-
-    setTimeout(() => {
-      arcEl.classList.remove('fading');
-    }, 1200);
+    }, 1800);
 
     wheelVisible = true;
   }
