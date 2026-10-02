@@ -87,11 +87,11 @@
     transform: translate(-50%, -50%); object-fit: contain;
     z-index: 1;
   }
-  /* На титульном — круг прозрачный (opacity: 0). Дуга видна, круга нет. */
+  /* На титульном — лого PNG ВИДНО */
   .pp-logo.on-title {
     top: 22vh; left: 50vw;
     width: 28vmin; height: 28vmin;
-    opacity: 0;
+    opacity: 1;
   }
   .pp-logo.in-corner-mobile {
     top: 117vh; left: 50vw;
@@ -101,7 +101,7 @@
     z-index: 15;
   }
 
-  /* ДУГА */
+  /* ДУГА — на титульном прозрачная */
   .arc {
     position: fixed;
     border: 2px solid rgba(190,172,140,0.65);
@@ -119,11 +119,12 @@
                 margin var(--intro-dur) var(--intro-ease),
                 opacity var(--sync-dur) var(--sync-ease);
   }
+  /* На титульном дуга совпадает с лого по позиции, но прозрачна */
   .arc.on-title {
     top: 22vh; left: 50vw;
     width: 32vmin; height: 32vmin;
     margin-top: -16vmin; margin-left: -16vmin;
-    opacity: 1;
+    opacity: 0;
   }
   .arc.expanded {
     top: 117vh; left: 50vw;
@@ -203,7 +204,7 @@
   }
   .title-badge.entered { transform: translateY(0); opacity: 1; }
 
-  /* МЕНЮ — контейнер на весь экран */
+  /* МЕНЮ */
   .wheel-menu {
     position: fixed;
     inset: 0;
@@ -215,9 +216,7 @@
   }
   .wheel-menu.visible { opacity: 1; }
 
-  /* ПУНКТЫ МЕНЮ.
-     Размер шрифта ОДИНАКОВЫЙ у всех — 14px.
-     Активный выделяется цветом, жирностью и scale. Scale — БЕЗ изменения layout. */
+  /* ПУНКТЫ МЕНЮ */
   .wheel-item {
     position: absolute;
     left: 0; top: 0;
@@ -703,7 +702,7 @@ function startIntro() {
   introStarted = true;
   intro.classList.add('expanding');
   /* Лого и дуга едут из центра в титульную позицию одновременно с ромбом.
-     Круг-лого на титульном — прозрачный (opacity: 0). Дуга видна. */
+     На титульном лого PNG ВИДНО, дуга ПРОЗРАЧНА. */
   ppLogo.classList.add('on-title');
   arc.classList.add('on-title');
   setTimeout(() => {
@@ -777,8 +776,8 @@ function goTo(n) {
   }
 
   if (!wheelVisible) {
-    /* При переходе в меню — круг-лого ПРОЯВЛЯЕТСЯ и уезжает вниз.
-       Дуга едет вниз. Цельный лого въезжает снизу. */
+    /* При переходе в меню — лого PNG уезжает и растворяется.
+       Дуга ПРОЯВЛЯЕТСЯ и уезжает вниз. Цельный лого въезжает снизу. */
     ppLogo.classList.remove('on-title');
     ppLogo.classList.add('in-corner-mobile');
     arc.classList.remove('on-title');
