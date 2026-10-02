@@ -66,11 +66,11 @@
   }
   .intro.expanding .intro-black { transform: translate(-50%, -50%) rotate(45deg) scale(10); }
 
-  /* КРУГ-ЛОГО — на титульном и в меню */
+  /* КРУГ-ЛОГО */
   .pp-logo {
     position: fixed;
     top: 50%; left: 50%;
-    width: 30vmin; height: 30vmin;
+    width: 28vmin; height: 28vmin;
     transform: translate(-50%, -50%);
     z-index: 110;
     pointer-events: none;
@@ -87,10 +87,11 @@
     transform: translate(-50%, -50%); object-fit: contain;
     z-index: 1;
   }
+  /* На титульном — круг прозрачный (opacity: 0). Дуга видна, круга нет. */
   .pp-logo.on-title {
     top: 22vh; left: 50vw;
     width: 28vmin; height: 28vmin;
-    opacity: 1;
+    opacity: 0;
   }
   .pp-logo.in-corner-mobile {
     top: 117vh; left: 50vw;
@@ -100,7 +101,7 @@
     z-index: 15;
   }
 
-  /* ДУГА — стартует из центра вместе с лого, на титульном становится вокруг лого */
+  /* ДУГА */
   .arc {
     position: fixed;
     border: 2px solid rgba(190,172,140,0.65);
@@ -118,11 +119,10 @@
                 margin var(--intro-dur) var(--intro-ease),
                 opacity var(--sync-dur) var(--sync-ease);
   }
-  /* На титульном дуга совпадает с лого */
   .arc.on-title {
     top: 22vh; left: 50vw;
-    width: 30vmin; height: 30vmin;
-    margin-top: -15vmin; margin-left: -15vmin;
+    width: 32vmin; height: 32vmin;
+    margin-top: -16vmin; margin-left: -16vmin;
     opacity: 1;
   }
   .arc.expanded {
@@ -203,7 +203,7 @@
   }
   .title-badge.entered { transform: translateY(0); opacity: 1; }
 
-  /* МЕНЮ — контейнер на весь экран, прозрачный, только для пунктов */
+  /* МЕНЮ — контейнер на весь экран */
   .wheel-menu {
     position: fixed;
     inset: 0;
@@ -215,7 +215,9 @@
   }
   .wheel-menu.visible { opacity: 1; }
 
-  /* ПУНКТЫ МЕНЮ — абсолютные внутри .wheel-menu (он на весь экран) */
+  /* ПУНКТЫ МЕНЮ.
+     Размер шрифта ОДИНАКОВЫЙ у всех — 14px.
+     Активный выделяется цветом, жирностью и scale. Scale — БЕЗ изменения layout. */
   .wheel-item {
     position: absolute;
     left: 0; top: 0;
@@ -224,17 +226,17 @@
     text-transform: uppercase; white-space: nowrap;
     line-height: 1; padding: 0;
     color: rgba(190,172,140,0.4);
-    will-change: transform;
-    transform: translate3d(var(--x, 50vw), var(--y, 100vh), 0) translate(-50%, -50%);
+    transform: translate3d(var(--x, 50vw), var(--y, 100vh), 0) translate(-50%, -50%) scale(1);
+    transform-origin: center center;
     transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1),
-                color 0.5s ease, opacity 0.5s ease, font-size 0.5s ease;
+                color 0.5s ease, opacity 0.5s ease;
     pointer-events: auto; cursor: pointer;
     z-index: 52;
   }
   .wheel-item.active {
     color: var(--cream) !important;
     font-weight: 700;
-    font-size: 28px;
+    transform: translate3d(var(--x, 50vw), var(--y, 100vh), 0) translate(-50%, -50%) scale(2);
   }
 
   /* РАЗМЫТИЕ ПОД МЕНЮ */
@@ -700,7 +702,8 @@ function startIntro() {
   if (introStarted) return;
   introStarted = true;
   intro.classList.add('expanding');
-  /* Одновременно с ромбом лого и дуга едут из центра в титульную позицию */
+  /* Лого и дуга едут из центра в титульную позицию одновременно с ромбом.
+     Круг-лого на титульном — прозрачный (opacity: 0). Дуга видна. */
   ppLogo.classList.add('on-title');
   arc.classList.add('on-title');
   setTimeout(() => {
@@ -774,6 +777,8 @@ function goTo(n) {
   }
 
   if (!wheelVisible) {
+    /* При переходе в меню — круг-лого ПРОЯВЛЯЕТСЯ и уезжает вниз.
+       Дуга едет вниз. Цельный лого въезжает снизу. */
     ppLogo.classList.remove('on-title');
     ppLogo.classList.add('in-corner-mobile');
     arc.classList.remove('on-title');
