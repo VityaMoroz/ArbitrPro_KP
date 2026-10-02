@@ -66,17 +66,19 @@
   }
   .intro.expanding .intro-black { transform: translate(-50%, -50%) rotate(45deg) scale(10); }
 
-  /* КРУГ-ЛОГО НА ТИТУЛЬНОМ */
+  /* КРУГ-ЛОГО — стартует из центра, едет в финальную точку ОДНОВРЕМЕННО с ромбом */
   .pp-logo {
-    position: fixed; top: 24vh; left: 50vw;
+    position: fixed;
+    top: 50%; left: 50%;
     width: 30vmin; height: 30vmin;
     transform: translate(-50%, -50%);
     z-index: 110;
     pointer-events: none;
-    transition: top var(--sync-dur) var(--sync-ease),
-                left var(--sync-dur) var(--sync-ease),
-                width var(--sync-dur) var(--sync-ease),
-                height var(--sync-dur) var(--sync-ease),
+    opacity: 0;
+    transition: top var(--intro-dur) var(--intro-ease),
+                left var(--intro-dur) var(--intro-ease),
+                width var(--intro-dur) var(--intro-ease),
+                height var(--intro-dur) var(--intro-ease),
                 opacity var(--sync-dur) var(--sync-ease),
                 filter var(--sync-dur) var(--sync-ease);
   }
@@ -85,33 +87,38 @@
     transform: translate(-50%, -50%); object-fit: contain;
     z-index: 1;
   }
+  /* Состояние "на титульном" — активируется через JS сразу после старта интро */
+  .pp-logo.on-title {
+    top: 24vh; left: 50vw;
+    width: 30vmin; height: 30vmin;
+    opacity: 1;
+  }
+  /* Состояние "в меню" — уезжает вниз, растёт, блюрится */
   .pp-logo.in-corner-mobile {
-    top: 117vh;
-    left: 50vw;
-    width: 90vh;
-    height: 90vh;
+    top: 117vh; left: 50vw;
+    width: 90vh; height: 90vh;
     opacity: 0.18;
     filter: blur(4px);
     z-index: 15;
   }
 
-  /* ДУГА */
+  /* ДУГА — стартует из центра, едет вместе с кругом */
   .arc {
     position: fixed;
     border: 2px solid rgba(190,172,140,0.65);
     border-radius: 50%;
     pointer-events: none;
     z-index: 30;
-    top: 24vh; left: 50vw;
+    top: 50%; left: 50%;
     width: 28vmin; height: 28vmin;
     margin-top: -14vmin; margin-left: -14vmin;
     opacity: 0;
-    transition: top var(--sync-dur) var(--sync-ease),
-                left var(--sync-dur) var(--sync-ease),
-                width var(--sync-dur) var(--sync-ease),
-                height var(--sync-dur) var(--sync-ease),
-                margin var(--sync-dur) var(--sync-ease),
-                opacity 0.6s ease;
+    transition: top var(--intro-dur) var(--intro-ease),
+                left var(--intro-dur) var(--intro-ease),
+                width var(--intro-dur) var(--intro-ease),
+                height var(--intro-dur) var(--intro-ease),
+                margin var(--intro-dur) var(--intro-ease),
+                opacity var(--sync-dur) var(--sync-ease);
   }
   .arc.visible { opacity: 1; }
   .arc.expanded {
@@ -204,17 +211,23 @@
     pointer-events: auto;
   }
   .wheel-menu.visible { opacity: 1; }
+
+  /* ПУНКТЫ МЕНЮ — внутри контейнера, без position: fixed.
+     Позиция задаётся переменными --x, --y и translate3d. */
   .wheel-item {
-    position: fixed;
+    position: absolute;
+    left: 0; top: 0;
     font-family: 'Myriad Pro', sans-serif;
     font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
     text-transform: uppercase; white-space: nowrap;
     line-height: 1; padding: 0;
     color: rgba(190,172,140,0.4);
+    will-change: transform;
+    transform: translate3d(var(--x, 50vw), var(--y, 100vh), 0) translate(-50%, -50%);
     transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1),
                 color 0.5s ease, opacity 0.5s ease, font-size 0.5s ease;
     pointer-events: auto; cursor: pointer;
-    z-index: 52; left: 0; top: 0;
+    z-index: 52;
   }
   .wheel-item.active {
     color: var(--cream) !important;
@@ -673,7 +686,7 @@ slides.forEach((s, i) => {
   calculate();
 })();
 
-/* ИНТРО */
+/* ИНТРО — круг-лого и дуга стартуют из центра, одновременно с ромбом едут в финальную точку */
 const intro = document.getElementById('intro');
 const ppLogo = document.getElementById('ppLogo');
 const arc = document.getElementById('arc');
@@ -686,6 +699,8 @@ function startIntro() {
   introStarted = true;
   intro.classList.add('expanding');
   arc.classList.add('visible');
+  // Одновременно с ромбом круг-лого едет из центра в финальную точку
+  ppLogo.classList.add('on-title');
   setTimeout(() => {
     intro.classList.add('hidden');
     document.getElementById('titleRight').classList.add('entered');
@@ -701,7 +716,9 @@ let current = -1;
 const totalSlides = slides.length;
 let wheelVisible = false;
 
-/* ПУНКТЫ МЕНЮ — под дугой */
+/* ПУНКТЫ МЕНЮ — под дугой.
+   Позиция задаётся через CSS-переменные --x и --y, никаких left/top.
+   Пункты живут внутри .wheel-menu (position: absolute). */
 function positionWheelItem(el, offset) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -713,7 +730,10 @@ function positionWheelItem(el, offset) {
   const angleRad = (offset * 14) * Math.PI / 180;
   const x = cx + R * Math.sin(angleRad);
   const y = topOfArc + baseShift + Math.abs(offset) * stepDown;
-  el.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%))`;
+
+  el.style.setProperty('--x', x + 'px');
+  el.style.setProperty('--y', y + 'px');
+
   const absOff = Math.abs(offset);
   const alpha = Math.max(0, 1 - absOff * 0.2);
   el.style.opacity = alpha.toFixed(3);
@@ -744,6 +764,7 @@ function goTo(n) {
     rz.classList.remove('visible');
     wheelBackdrop.classList.remove('visible');
     ppLogo.classList.remove('in-corner-mobile');
+    ppLogo.classList.remove('on-title');
     brandCorner.classList.remove('visible');
     document.getElementById('titleSlide').classList.remove('gone');
     document.querySelectorAll('.card-slot').forEach(el => el.classList.remove('active'));
@@ -752,6 +773,7 @@ function goTo(n) {
   }
 
   if (!wheelVisible) {
+    ppLogo.classList.remove('on-title');
     ppLogo.classList.add('in-corner-mobile');
     brandCorner.classList.add('visible');
     arc.classList.add('expanded');
@@ -775,14 +797,12 @@ function goTo(n) {
   });
 }
 
-/* ТАП ПО ТИТУЛЬНОМУ → переход к первому разделу */
-document.getElementById('titleSlide').addEventListener('click', (e) => {
-  if (current === -1) {
-    goTo(0);
-  }
+/* ТАП ПО ТИТУЛЬНОМУ */
+document.getElementById('titleSlide').addEventListener('click', () => {
+  if (current === -1) goTo(0);
 });
 
-/* СВАЙП — только от середины экрана, края не перехватываем */
+/* СВАЙП — только от середины экрана */
 const deck = document.getElementById('deck');
 const EDGE_GUARD = 40;
 let touchStartX = 0;
@@ -833,6 +853,9 @@ deck.addEventListener('touchend', (e) => {
 }, { passive: true });
 
 window.addEventListener('resize', () => { refreshMenuPositions(); });
+
+/* Первичная расстановка пунктов меню */
+refreshMenuPositions();
 </script>
 </body>
 </html>
